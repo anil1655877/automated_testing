@@ -31,7 +31,7 @@ app.add_middleware(
 # Mount Screenshots & Uploaded Static Directories
 ROOT_DIR = Path(__file__).parent.parent
 SCREENSHOT_PATH = ROOT_DIR / "reports"
-SCREENSHOT_PATH.parent.mkdir(parents=True, exist_ok=True)
+SCREENSHOT_PATH.mkdir(parents=True, exist_ok=True)
 app.mount("/reports", StaticFiles(directory=str(SCREENSHOT_PATH)), name="reports")
 
 UPLOAD_PATH = ROOT_DIR / "data" / "uploads"
