@@ -1,0 +1,315 @@
+// ============================================================
+// AI-Enhanced Enterprise Test Automation Framework
+// Jenkins Declarative Pipeline
+// ============================================================
+// STAGES:
+//   1. Checkout        - Get latest code from Git
+//   2. Setup           - Install Python dependencies
+//   3. Lint            - Code quality checks
+//   4. Smoke Tests     - Critical path validation
+//   5. Regression      - Full regression suite
+//   6. API Tests       - API validation
+//   7. DB Tests        - Database validation
+//   8. Reports         - Generate Allure HTML reports
+//   9. Archive         - Save artifacts
+//  10. Notify          - Team notification
+// ============================================================
+
+pipeline {
+    agent any
+
+    // ── Tool Definitions ─────────────────────────────────────
+    tools {
+        // Requires Python plugin in Jenkins
+        // Install Python 3.11 via Global Tool Configuration
+    }
+
+    // ── Pipeline Parameters ──────────────────────────────────
+    parameters {
+        choice(
+            name: 'BROWSER',
+            choices: ['chrome', 'firefox', 'edge'],
+            description: 'Browser for UI tests'
+        )
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'production'],
+            description: 'Target test environment'
+        )
+        choice(
+            name: 'TEST_SUITE',
+            choices: ['smoke', 'regression', 'api', 'database', 'all'],
+            description: 'Test suite to execute'
+        )
+        booleanParam(
+            name: 'PARALLEL',
+            defaultValue: true,
+            description: 'Run tests in parallel'
+        )
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Run browser in headless mode'
+        )
+        booleanParam(
+            name: 'USE_MOCK_AI',
+            defaultValue: true,
+            description: 'Run AI in mock mode (prevents cloud quota limits)'
+        )
+        string(
+            name: 'PARALLEL_WORKERS',
+            defaultValue: '4',
+            description: 'Number of parallel workers (use -1 for auto)'
+        )
+    }
+
+    // ── Environment Variables ────────────────────────────────
+    environment {
+        // Python environment
+        PYTHONPATH        = "${WORKSPACE}"
+        VENV_DIR          = "${WORKSPACE}/.venv"
+
+        // Framework config (from params + Jenkins credentials)
+        BROWSER           = "${params.BROWSER}"
+        HEADLESS          = "${params.HEADLESS}"
+        ENVIRONMENT       = "${params.ENVIRONMENT}"
+        AI_ENABLED        = "true"
+        USE_MOCK_AI       = "${params.USE_MOCK_AI}"
+        SCREENSHOT_ON_FAILURE = "true"
+
+        // Credentials from Jenkins Credentials Manager
+        // Add these in: Manage Jenkins → Credentials
+        TEST_USERNAME     = credentials('TEST_USERNAME')
+        TEST_PASSWORD     = credentials('TEST_PASSWORD')
+        DB_PASSWORD       = credentials('DB_PASSWORD')
+
+        // Report paths
+        ALLURE_RESULTS    = "${WORKSPACE}/reports/allure-results"
+        HTML_REPORT       = "${WORKSPACE}/reports/html-reports/report.html"
+        SCREENSHOT_DIR    = "${WORKSPACE}/reports/screenshots"
+    }
+
+    // ── Stage Retry and Timeout Defaults ─────────────────────
+    options {
+        timeout(time: 60, unit: 'MINUTES')
+        retry(1)
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+        timestamps()
+    }
+
+    stages {
+
+        // ── STAGE 1: Checkout ─────────────────────────────────
+        stage('Checkout') {
+            steps {
+                echo "📥 Checking out code..."
+                checkout scm
+                script {
+                    env.GIT_COMMIT_MSG = sh(
+                        script: 'git log -1 --format=%B',
+                        returnStdout: true
+                    ).trim()
+                    env.BUILD_TRIGGER = currentBuild.getBuildCauses()[0]?.shortDescription ?: 'Manual'
+                }
+                echo "Commit: ${env.GIT_COMMIT_MSG}"
+            }
+        }
+
+        // ── STAGE 2: Environment Setup ────────────────────────
+        stage('Setup Environment') {
+            steps {
+                echo "🔧 Setting up Python virtual environment..."
+                sh '''
+                    python3 --version || python --version
+                    python3 -m venv ${VENV_DIR} || python -m venv ${VENV_DIR}
+                    . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                    pip install --upgrade pip --quiet
+                    pip install -r requirements.txt --quiet
+                    mkdir -p reports/html-reports reports/allure-results reports/screenshots logs
+                '''
+                echo "✓ Environment ready"
+            }
+        }
+
+        // ── STAGE 3: Code Quality ─────────────────────────────
+        stage('Code Quality') {
+            steps {
+                echo "🔍 Running linting checks..."
+                sh '''
+                    . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                    flake8 . --max-line-length=120 --exclude=.venv,reports,logs \
+                        --ignore=E501,W503 --count --statistics || true
+                '''
+            }
+        }
+
+        // ── STAGE 4: Smoke Tests ──────────────────────────────
+        stage('Smoke Tests') {
+            steps {
+                echo "💨 Running smoke tests..."
+                sh """
+                    . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                    pytest tests/ -m smoke \
+                        --tb=short \
+                        -v \
+                        --reruns=2 \
+                        --reruns-delay=3 \
+                        --html=reports/html-reports/smoke_report.html \
+                        --self-contained-html \
+                        --alluredir=${ALLURE_RESULTS} \
+                        -q
+                """
+            }
+            post {
+                failure {
+                    echo "❌ Smoke tests FAILED — blocking pipeline"
+                }
+                success {
+                    echo "✅ Smoke tests PASSED"
+                }
+            }
+        }
+
+        // ── STAGE 5: Regression Tests ─────────────────────────
+        stage('Regression Tests') {
+            when {
+                anyOf {
+                    expression { params.TEST_SUITE == 'regression' }
+                    expression { params.TEST_SUITE == 'all' }
+                    branch 'main'
+                    branch 'develop'
+                }
+            }
+            steps {
+                echo "🔄 Running regression test suite..."
+                script {
+                    def parallelFlag = params.PARALLEL ? "-n ${params.PARALLEL_WORKERS}" : ""
+                    sh """
+                        . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                        pytest tests/ui/ -m regression \
+                            ${parallelFlag} \
+                            --tb=short \
+                            -v \
+                            --reruns=2 \
+                            --reruns-delay=3 \
+                            --alluredir=${ALLURE_RESULTS} \
+                            --html=reports/html-reports/regression_report.html \
+                            --self-contained-html
+                    """
+                }
+            }
+        }
+
+        // ── STAGE 6: API Tests ────────────────────────────────
+        stage('API Tests') {
+            when {
+                anyOf {
+                    expression { params.TEST_SUITE == 'api' }
+                    expression { params.TEST_SUITE == 'all' }
+                }
+            }
+            steps {
+                echo "🌐 Running API tests..."
+                sh """
+                    . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                    pytest tests/api/ \
+                        --tb=short \
+                        -v \
+                        --reruns=1 \
+                        --alluredir=${ALLURE_RESULTS} \
+                        --html=reports/html-reports/api_report.html \
+                        --self-contained-html
+                """
+            }
+        }
+
+        // ── STAGE 7: Database Tests ───────────────────────────
+        stage('Database Tests') {
+            when {
+                anyOf {
+                    expression { params.TEST_SUITE == 'database' }
+                    expression { params.TEST_SUITE == 'all' }
+                }
+            }
+            steps {
+                echo "🗄️ Running database validation tests..."
+                sh """
+                    . ${VENV_DIR}/bin/activate || ${VENV_DIR}/Scripts/activate
+                    pytest tests/database/ \
+                        --tb=short \
+                        -v \
+                        --alluredir=${ALLURE_RESULTS} \
+                        --html=reports/html-reports/db_report.html \
+                        --self-contained-html
+                """
+            }
+        }
+
+        // ── STAGE 8: Generate Reports ─────────────────────────
+        stage('Generate Reports') {
+            steps {
+                echo "📊 Generating Allure reports..."
+                script {
+                    try {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'reports/allure-results']]
+                        ])
+                    } catch (Exception e) {
+                        echo "Allure plugin not installed — skipping Allure report generation"
+                        echo "Install: Jenkins → Manage Plugins → Allure Jenkins Plugin"
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Post-Pipeline Actions ────────────────────────────────
+    post {
+        always {
+            echo "📦 Archiving artifacts..."
+            archiveArtifacts(
+                artifacts: 'reports/**/*',
+                allowEmptyArchive: true,
+                fingerprint: true
+            )
+
+            // Publish HTML reports
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports/html-reports',
+                reportFiles: '*.html',
+                reportName: 'Test Reports'
+            ])
+        }
+
+        success {
+            echo """
+            ╔══════════════════════════════════╗
+            ║  ✅  PIPELINE SUCCEEDED          ║
+            ║  Build #${BUILD_NUMBER}          ║
+            ╚══════════════════════════════════╝
+            """
+        }
+
+        failure {
+            echo """
+            ╔══════════════════════════════════╗
+            ║  ❌  PIPELINE FAILED             ║
+            ║  Build #${BUILD_NUMBER}          ║
+            ╚══════════════════════════════════╝
+            """
+        }
+
+        cleanup {
+            echo "🧹 Cleaning workspace..."
+            cleanWs(patterns: [[pattern: '**/.venv/**', type: 'EXCLUDE']])
+        }
+    }
+}

@@ -1,0 +1,55 @@
+{
+  "valid_login": [
+    {
+      "id": "TC-LOGIN-001",
+      "description": "Valid admin login",
+      "username": "admin",
+      "password": "Admin@123",
+      "expected_result": "success",
+      "redirect_url": "books"
+    }
+  ],
+  "invalid_login": [
+    {
+      "id": "TC-LOGIN-002",
+      "description": "Wrong password",
+      "username": "validuser",
+      "password": "WrongPass999",
+      "expected_result": "failure",
+      "expected_error": "Invalid username or password!"
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "description": "Non-existent user",
+      "username": "ghost_user_xyz",
+      "password": "Password@123",
+      "expected_result": "failure",
+      "expected_error": "User not found!"
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "description": "Empty credentials",
+      "username": "",
+      "password": "",
+      "expected_result": "failure",
+      "expected_error": "Required"
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "description": "SQL Injection attempt",
+      "username": "admin' OR '1'='1",
+      "password": "anything",
+      "expected_result": "failure",
+      "expected_error": "Invalid"
+    }
+  ],
+  "boundary_login": [
+    {
+      "id": "TC-LOGIN-006",
+      "description": "Max length username",
+      "username": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "password": "Password@123",
+      "expected_result": "failure"
+    }
+  ]
+}

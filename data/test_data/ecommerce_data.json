@@ -1,0 +1,27 @@
+{
+  "search_terms": {
+    "valid": ["Git", "JavaScript", "Python", "You Don't Know"],
+    "no_results": ["xyzabc_no_results_12345"],
+    "partial": ["Git Po", "Learn", "Design"]
+  },
+  "books": [
+    {
+      "title": "Git Pocket Guide",
+      "author": "Richard E. Silverman",
+      "publisher": "O'Reilly Media"
+    },
+    {
+      "title": "Learning JavaScript Design Patterns",
+      "author": "Addy Osmani",
+      "publisher": "O'Reilly Media"
+    }
+  ],
+  "pagination": {
+    "rows_per_page_options": [5, 10, 20],
+    "default_rows": 10
+  },
+  "filters": {
+    "categories": ["All", "Technology", "Programming"],
+    "sort_options": ["Title A-Z", "Title Z-A", "Author"]
+  }
+}

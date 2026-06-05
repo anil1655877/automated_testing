@@ -1,0 +1,162 @@
+# ============================================================
+# AI-Enhanced Enterprise Test Automation Framework
+# Docker Compose — Full Stack (App + Selenium Grid + MySQL)
+# ============================================================
+version: "3.9"
+
+services:
+
+  # ── Test Runner Service ────────────────────────────────────
+  test-runner:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ai-test-runner
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      selenium-hub:
+        condition: service_healthy
+    environment:
+      # Framework configuration
+      - ENVIRONMENT=dev
+      - BROWSER=chrome
+      - HEADLESS=true
+      - BASE_URL=${BASE_URL:-https://demoqa.com}
+      - API_BASE_URL=${API_BASE_URL:-https://demoqa.com}
+      # Database (points to MySQL service below)
+      - DB_HOST=mysql-db
+      - DB_PORT=3306
+      - DB_NAME=test_automation_db
+      - DB_USER=automation_user
+      - DB_PASSWORD=AutomationDB@123
+      # Selenium Grid
+      - USE_SELENIUM_GRID=true
+      - SELENIUM_GRID_URL=http://selenium-hub:4444/wd/hub
+      # AI & Reporting
+      - AI_ENABLED=true
+      - USE_MOCK_AI=true
+      - SCREENSHOT_ON_FAILURE=true
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../reports:/app/reports        # Mount reports to host
+      - ../logs:/app/logs              # Mount logs to host
+    command: pytest tests/ -m smoke --tb=short -v
+    networks:
+      - test-network
+
+  # ── MySQL Database Service ─────────────────────────────────
+  mysql-db:
+    image: mysql:8.0
+    container_name: ai-test-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPass@123
+      MYSQL_DATABASE: test_automation_db
+      MYSQL_USER: automation_user
+      MYSQL_PASSWORD: AutomationDB@123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pRootPass@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - test-network
+
+  # ── Selenium Hub ───────────────────────────────────────────
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4442:4442"
+      - "4443:4443"
+    environment:
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_SESSION_REQUEST_TIMEOUT=300
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  # ── Chrome Node ────────────────────────────────────────────
+  chrome-node:
+    image: selenium/node-chrome:4.15.0
+    container_name: selenium-chrome
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=3
+      - SE_NODE_SESSION_TIMEOUT=300
+    shm_size: 2gb
+    networks:
+      - test-network
+
+  # ── Firefox Node ───────────────────────────────────────────
+  firefox-node:
+    image: selenium/node-firefox:4.15.0
+    container_name: selenium-firefox
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=2
+    shm_size: 2gb
+    networks:
+      - test-network
+
+  # ── Allure Report Server (optional) ───────────────────────
+  allure-server:
+    image: frankescobar/allure-docker-service:2.21.0
+    container_name: allure-server
+    environment:
+      - CHECK_RESULTS_EVERY_SECONDS=3
+      - KEEP_HISTORY=20
+    ports:
+      - "5050:5050"
+    volumes:
+      - ../reports/allure-results:/app/allure-results
+      - ../reports/allure-report:/app/default-reports
+    networks:
+      - test-network
+
+# ── Volumes ───────────────────────────────────────────────────
+volumes:
+  mysql-data:
+    driver: local
+
+# ── Networks ──────────────────────────────────────────────────
+networks:
+  test-network:
+    driver: bridge
+
+# ============================================================
+# USAGE:
+#   Start full stack:
+#     docker-compose up -d
+#
+#   Run tests:
+#     docker-compose run --rm test-runner pytest tests/ -m regression
+#
+#   View Selenium Grid:
+#     Open http://localhost:4444
+#
+#   View Allure Server:
+#     Open http://localhost:5050
+#
+#   Stop all:
+#     docker-compose down -v
+# ============================================================

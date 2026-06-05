@@ -1,0 +1,125 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyTest
+.pytest_cache/
+.pytest_tmp/
+pytest_cache/
+
+# Reports (generated at runtime)
+reports/html-reports/*.html
+reports/allure-results/*
+reports/screenshots/*
+!reports/html-reports/.gitkeep
+!reports/allure-results/.gitkeep
+!reports/screenshots/.gitkeep
+
+# Logs
+logs/*.log
+logs/*.txt
+!logs/.gitkeep
+
+# Database
+*.sqlite
+*.db
+*.sqlite3
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# WebDrivers
+drivers/*.exe
+drivers/*.zip
+drivers/chromedriver*
+drivers/geckodriver*
+drivers/msedgedriver*
+!drivers/.gitkeep
+
+# Coverage
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environment
+.env
+*.env.local
+*.env.*.local
+
+# Docker
+.docker/
+
+# Node (for any frontend testing)
+node_modules/
+npm-debug.log*
+
+# Allure
+allure-report/
+
+# Jupyter
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Sensitive Data
+secrets/
+*.pem
+*.key
+*.cert
+credentials.json
+service_account.json
+
+# QA Backend Node runtime dirs
+qa-backend-node/public/uploads/
+qa-backend-node/public/videos/
+qa-backend-node/public/screenshots/
+qa-backend-node/database.sqlite

@@ -1,0 +1,59 @@
+# ============================================================
+# GitHub Actions: PR Validation (Smoke Tests on every PR)
+# ============================================================
+name: 🔎 PR Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: PR Smoke Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Create directories & .env
+        run: |
+          mkdir -p reports/html-reports reports/allure-results logs
+          echo "ENVIRONMENT=dev" > .env
+          echo "BROWSER=chrome" >> .env
+          echo "HEADLESS=true" >> .env
+          echo "BASE_URL=https://demoqa.com" >> .env
+          echo "AI_ENABLED=true" >> .env
+          echo "USE_MOCK_AI=true" >> .env
+
+      - name: Run smoke tests
+        run: |
+          pytest tests/ -m smoke \
+            --tb=short -v \
+            --reruns=2 \
+            --html=reports/html-reports/pr_smoke.html \
+            --self-contained-html \
+            -p no:warnings
+
+      - name: Upload PR Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-smoke-report
+          path: reports/
+          retention-days: 3

@@ -1,0 +1,31 @@
+{
+  "name": "qa-backend-node",
+  "version": "1.0.0",
+  "description": "Node.js Express + Playwright backend for AI-powered automated testing platform",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "multer": "^1.4.5-lts.1",
+    "playwright": "^1.42.1",
+    "jszip": "^3.10.1",
+    "fs-extra": "^11.2.0",
+    "uuid": "^9.0.1",
+    "socket.io": "^4.7.5",
+    "sequelize": "^6.37.1",
+    "sqlite3": "^5.1.7",
+    "pg": "^8.11.3",
+    "pdfkit": "^0.15.0",
+    "mongoose": "^8.2.0",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

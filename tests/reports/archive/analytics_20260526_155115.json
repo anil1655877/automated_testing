@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-26T15:51:15.758262",
+  "exit_status": 1,
+  "passed": 4,
+  "failed": 1,
+  "skipped": 0,
+  "total_tests": 5,
+  "ai_failure_analysis": {}
+}

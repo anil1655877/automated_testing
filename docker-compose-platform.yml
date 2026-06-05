@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL Database ──
+  postgres-db:
+    image: postgres:15
+    container_name: qa-postgres-db
+    environment:
+      POSTGRES_DB: qa_automation_platform
+      POSTGRES_USER: qa_platform_user
+      POSTGRES_PASSWORD: SecurePlatformPassword123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-platform-data:/var/lib/postgresql/data
+    networks:
+      - platform-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qa_platform_user -d qa_automation_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Express + Playwright QA Backend Engine ──
+  qa-backend-node:
+    build:
+      context: ./qa-backend-node
+      dockerfile: Dockerfile
+    container_name: qa-backend-node
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DATABASE_URL=postgres://qa_platform_user:SecurePlatformPassword123@postgres-db:5432/qa_automation_platform
+      - NODE_ENV=production
+      - RUNNING_IN_DOCKER=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - platform-uploads:/usr/src/app/public/uploads
+      - platform-screenshots:/usr/src/app/public/screenshots
+      - platform-videos:/usr/src/app/public/videos
+    networks:
+      - platform-network
+
+  # ── React Frontend Dev/Server Container ──
+  qa-frontend:
+    image: node:20-alpine
+    container_name: qa-frontend-node
+    working_dir: /app
+    volumes:
+      - ./qa-frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - qa-backend-node
+    networks:
+      - platform-network
+
+volumes:
+  postgres-platform-data:
+    driver: local
+  platform-uploads:
+    driver: local
+  platform-screenshots:
+    driver: local
+  platform-videos:
+    driver: local
+
+networks:
+  platform-network:
+    driver: bridge

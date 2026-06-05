@@ -1,0 +1,70 @@
+# ============================================================
+# AI-Enhanced Enterprise Test Automation Framework
+# Requirements File
+# ============================================================
+
+# ── Core Testing Framework ──────────────────────────────────
+pytest==8.3.2
+pytest-html==4.1.1
+pytest-xdist==3.5.0          # Parallel test execution
+pytest-rerunfailures==14.0   # Retry failed tests
+pytest-ordering==0.6         # Test execution ordering
+pytest-timeout==2.3.1        # Test timeout support
+pytest-randomly==3.15.0      # Random test ordering
+
+# ── Selenium WebDriver ──────────────────────────────────────
+selenium==4.25.0
+webdriver-manager==4.0.2     # Auto-manage browser drivers
+seleniumbase==4.29.0         # Enhanced Selenium features
+
+# ── API Testing ─────────────────────────────────────────────
+requests==2.32.3
+httpx==0.27.2                # Async HTTP client
+jsonschema==4.23.0           # JSON schema validation
+responses==0.25.3            # Mock HTTP responses
+
+# ── Database ────────────────────────────────────────────────
+mysql-connector-python==9.0.0
+pymysql==1.1.1
+SQLAlchemy==2.0.35
+alembic==1.13.3
+
+# ── Reporting ───────────────────────────────────────────────
+allure-pytest==2.13.5
+allure-python-commons==2.13.5
+
+# ── Data Handling ───────────────────────────────────────────
+pandas==2.2.2
+openpyxl==3.1.5              # Excel read/write
+faker==30.3.0                # Fake test data generation
+jsonpath-ng==1.6.1           # JSONPath queries
+PyYAML==6.0.2                # YAML config support
+
+# ── AI & Machine Learning ───────────────────────────────────
+scikit-learn==1.5.2          # ML for bug prediction
+numpy==2.1.1                 # Numerical computing
+fuzzywuzzy==0.18.0           # Fuzzy string matching (self-healing)
+python-Levenshtein==0.25.1   # Levenshtein distance
+difflib2==0.1.0              # Diff utilities
+
+# ── Image & Screenshot ──────────────────────────────────────
+Pillow==10.4.0               # Image processing
+opencv-python-headless==4.10.0.84  # Image comparison
+
+# ── Utilities ───────────────────────────────────────────────
+python-dotenv==1.0.1         # Environment variables
+configparser==7.1.0          # INI config parsing
+colorlog==6.8.2              # Colored logging output
+rich==13.8.1                 # Rich terminal output
+tenacity==9.0.0              # Retry logic
+schedule==1.2.2              # Job scheduling
+
+# ── Type Checking & Code Quality ────────────────────────────
+mypy==1.11.2
+black==24.8.0
+flake8==7.1.1
+isort==5.13.2
+
+# ── Documentation ───────────────────────────────────────────
+Sphinx==8.0.2
+sphinx-rtd-theme==2.0.0

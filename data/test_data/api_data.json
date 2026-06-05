@@ -1,0 +1,35 @@
+{
+  "base_url": "https://demoqa.com",
+  "auth": {
+    "valid_credentials": {
+      "userName": "testuser_demo",
+      "password": "Test@12345"
+    },
+    "invalid_credentials": {
+      "userName": "fakeuser",
+      "password": "WrongPass"
+    }
+  },
+  "books": {
+    "known_isbn": "9781449325862",
+    "known_title": "Git Pocket Guide",
+    "invalid_isbn": "INVALID-ISBN-999"
+  },
+  "user_schema": {
+    "create": {
+      "userName": "api_test_user_001",
+      "password": "ApiTest@123"
+    }
+  },
+  "expected_status_codes": {
+    "success": 200,
+    "created": 201,
+    "bad_request": 400,
+    "unauthorized": 401,
+    "forbidden": 403,
+    "not_found": 404
+  },
+  "performance": {
+    "max_response_time_ms": 3000
+  }
+}

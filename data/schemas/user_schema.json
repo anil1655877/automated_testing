@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User Schema",
+  "description": "JSON schema for user creation and profile API responses",
+  "type": "object",
+  "required": ["userID", "username", "books"],
+  "properties": {
+    "userID": {
+      "type": "string",
+      "description": "Unique user identifier (UUID format)"
+    },
+    "username": {
+      "type": "string",
+      "description": "Username",
+      "minLength": 1
+    },
+    "books": {
+      "type": "array",
+      "description": "User's book collection",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "auth_token_schema": {
+    "type": "object",
+    "required": ["token", "expires", "status", "result"],
+    "properties": {
+      "token":   { "type": "string" },
+      "expires": { "type": "string" },
+      "status":  { "type": "string", "enum": ["Success", "Failed"] },
+      "result":  { "type": "string" }
+    }
+  },
+  "create_user_response_schema": {
+    "type": "object",
+    "required": ["userID", "username", "books"],
+    "properties": {
+      "userID":   { "type": "string" },
+      "username": { "type": "string" },
+      "books":    { "type": "array" }
+    }
+  }
+}

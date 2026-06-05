@@ -1,0 +1,137 @@
+[
+  {
+    "timestamp": "2026-05-25T14:33:59.189839",
+    "exit_status": 0,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 6,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:34:14.762532",
+    "exit_status": 0,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 8,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:38:54.745913",
+    "exit_status": 0,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 1,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:39:11.521005",
+    "exit_status": 0,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 8,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:39:43.992504",
+    "exit_status": 0,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 6,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:39:56.720589",
+    "exit_status": 0,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 4,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:39:56.777824",
+    "exit_status": 0,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 4,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:39:57.280283",
+    "exit_status": 0,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 8,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:40:14.745808",
+    "exit_status": 0,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 4,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:40:15.529299",
+    "exit_status": 0,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 2,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-25T14:40:15.933544",
+    "exit_status": 0,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 6,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-26T09:27:16.015908",
+    "exit_status": 0,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 6,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-26T09:27:27.881255",
+    "exit_status": 0,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "total_tests": 8,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-05-26T15:51:15.758262",
+    "exit_status": 1,
+    "passed": 4,
+    "failed": 1,
+    "skipped": 0,
+    "total_tests": 5,
+    "ai_failure_analysis": {}
+  },
+  {
+    "timestamp": "2026-06-01T11:26:48.677657",
+    "exit_status": 1,
+    "passed": 1,
+    "failed": 8,
+    "skipped": 0,
+    "total_tests": 9,
+    "ai_failure_analysis": {}
+  }
+]
