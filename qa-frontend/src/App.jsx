@@ -181,7 +181,10 @@ export default function App() {
 
   // Connect to Socket.IO and listen to live events
   useEffect(() => {
-    socketRef.current = io(window.location.origin);
+    const socketUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5000'
+      : window.location.origin;
+    socketRef.current = io(socketUrl);
 
     socketRef.current.on('connect', () => {
       console.log('Socket.IO connection established with backend.');
