@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, relationship, scoped_session
 from pathlib import Path
 
 # Paths
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).resolve().parent
 DB_PATH = ROOT_DIR / "data" / "qa_platform.sqlite"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 

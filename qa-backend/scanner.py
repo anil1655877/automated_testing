@@ -10,7 +10,7 @@ from database import Scan, Bug
 from pathlib import Path
 
 # Paths
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).resolve().parent
 SCREENSHOT_DIR = ROOT_DIR / "reports" / "screenshots" / "scans"
 SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
 
