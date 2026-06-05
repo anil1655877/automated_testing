@@ -11,11 +11,18 @@ from typing import List, Dict, Any
 from pathlib import Path
 from datetime import datetime
 
-from database import init_db, get_db, Scan, Bug, Notification
-from scanner import QAPlatformScanner
-
-# Initialize DB on Startup
-init_db()
+try:
+    from database import init_db, get_db, Scan, Bug, Notification
+    from scanner import QAPlatformScanner
+    
+    # Initialize DB on Startup
+    init_db()
+except Exception as e:
+    import sys, traceback
+    print("BACKEND STARTUP ERROR:", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+    sys.stderr.flush()
+    sys.exit(1)
 
 app = FastAPI(title="AI-Powered QA SaaS API")
 
